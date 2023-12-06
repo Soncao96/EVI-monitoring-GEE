@@ -1,0 +1,61 @@
+# Real-color-images-collection-with-GEE
+
+// Designate a study area region
+var studyArea =  ee.Geometry.Polygon(
+        [[[3.246980338791907, 45.835336025505995],
+        [3.247881561020911, 45.83249544350292],
+        [3.249383598069251, 45.83285426186172],
+        [3.2479673917093876, 45.837279498073954],
+        [3.2462507779398564, 45.837458892119855]]]);;
+Map.addLayer(studyArea,{color:'green'},'Border');
+
+// Load Sentinel-2 data
+var sent2 = ee.ImageCollection('COPERNICUS/S2_SR');
+
+var image = ee.Image(sent2
+  .filterDate("2020-02-26", "2020-03-08")
+  .filterBounds(studyArea) 
+  .sort("CLOUD_COVERAGE_ASSESSMENT")
+  .first());
+Map.addLayer(image, {min:450, max:4500, bands:['B4','B3','B2']}, 'Sentinel 2 RGB L2A', false);
+
+var trueColor = {
+  bands: ["B4", "B3", "B2"],
+  min: 0,
+  max: 3000
+};
+
+Map.addLayer(image, trueColor, "True Color Image");
+
+// Selecting the SCL (Scene Classification Band)
+var scl = image.select('SCL');
+Map.addLayer(scl, {min:1, max:11}, 'SCL Band', false);
+
+// Selecting the cloud shadow and cloud masks (3,7,8,9);
+var cloud_shadow = scl.eq(3);
+var cloud_low = scl.eq(7);
+var cloud_medium = scl.eq(8);
+var cloud_high = scl.eq(9);
+Map.addLayer(cloud_high, {min:0,max:1, palette:['black','red']}, 'Cloud High Binary Mask', false);
+
+// Merging the masks together
+var cloud_mask = cloud_shadow.add(cloud_low).add(cloud_medium).add(cloud_high);
+Map.addLayer(cloud_mask, {min:0, max:1, palette:['black','red']}, 'Merged Cloud Masks', false);
+
+// Creating a uniary mask image from the binary mask image i.e. replacing the black with nulls
+var cloud_uni = cloud_mask.eq(0).selfMask();
+Map.addLayer(cloud_uni, {palette:['red']}, 'Cloud Uniary Mask', false);
+
+// Finally masking the original image (or bands) with cloud mask
+var cloud_masked = image.updateMask(cloud_uni);
+Map.addLayer(cloud_masked, {min:1251, max:6001, gamma:1.6, bands:['B4','B3','B2']}, 'Cloud Masked');
+
+// TRANSPARENT Study Border
+var shown = true; // true or false, 1 or 0 
+var opacity = 0.05; // number [0-1]
+var nameLayer = 'border'; // string
+var visParams = {color: '#FFFFFF77'}; 
+Map.addLayer(studyArea, visParams, nameLayer, shown, opacity);
+
+// Zoom to study area
+Map.centerObject(studyArea, 15);
