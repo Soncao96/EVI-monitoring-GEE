@@ -1,5 +1,5 @@
 # EVI-monitoring-GEE
-// Testing a random region
+// Designate a study area region
 var studyArea =  ee.Geometry.Polygon(
         [[[3.246980338791907, 45.835336025505995],
         [3.247881561020911, 45.83249544350292],
