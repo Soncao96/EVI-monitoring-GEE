@@ -1,10 +1,8 @@
 # EVI-monitoring-GEE
-The enhanced vegetation index (EVI) is an 'optimal' vegetation index that decouples 
-the canopy background signal and reduces atmospheric impacts to improve the vegetation signal with greater sensitivity in high biomass regions and improved vegetation monitoring.
+The Enhanced Vegetation Index (EVI) is a satellite-derived index designed to optimize the vegetation signal while minimizing soil and atmospheric influences, such as aerosol scattering. EVI improves upon the Normalized Difference Vegetation Index (NDVI) by reducing sensitivity to atmospheric conditions and enhancing the response in areas with dense vegetation cover. It achieves this by adding coefficients that account for atmospheric resistance and canopy background effects.
 
 # Objective
 To retrieve and monitor EVI values of a certain region of interest for a period of time using Sentinel 2 images 
-
 
 # Enhanced Vegetation Index (EVI) Formula:
 EVI = G * ((NIR - R) / (NIR + C1 * R – C2 * B + L))   or
